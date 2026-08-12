@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ChatPDF — Professional PDF Tools</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={darkMode:'class',theme:{extend:{colors:{brand:{400:'#a78bfa',500:'#8b5cf6',600:'#7c3aed',700:'#6d28d9'}}}}}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#07070a;color:#f4f4f5;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.glass{background:rgba(18,18,24,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.grid-bg{background-image:linear-gradient(rgba(139,92,246,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,.07) 1px,transparent 1px);background-size:34px 34px}
+.orb{filter:blur(55px);animation:float 8s ease-in-out infinite}.orb2{filter:blur(60px);animation:float2 10s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(35px,-25px,15px)}}@keyframes float2{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-35px,25px,0)}}
+.card3d{transform-style:preserve-3d;transition:.3s}.card3d:hover{transform:translateY(-7px) rotateX(2deg);box-shadow:0 25px 70px rgba(124,58,237,.18)}
+.iconbox{box-shadow:inset 0 1px rgba(255,255,255,.08),0 10px 35px rgba(0,0,0,.2)}
+.drop-active{border-color:#8b5cf6!important;background:rgba(139,92,246,.10)}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:#3f3f46;border-radius:999px}
+
+/* ChatPDF Ultimate 3D visual layer */
+html{scroll-behavior:smooth}
+body{background:#040406;letter-spacing:.005em}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.025;background-image:radial-gradient(rgba(255,255,255,.8) .5px,transparent .5px);background-size:4px 4px}
+.glass{background:linear-gradient(135deg,rgba(25,25,34,.82),rgba(8,8,12,.68));border-color:rgba(255,255,255,.07);box-shadow:inset 0 1px rgba(255,255,255,.07),0 30px 100px rgba(0,0,0,.32)}
+.grid-bg{mask-image:linear-gradient(to bottom,black,transparent 82%);opacity:.8}
+.orb{background:radial-gradient(circle,rgba(139,92,246,.34),rgba(124,58,237,.06) 48%,transparent 70%);filter:blur(35px);animation:float 9s ease-in-out infinite}
+.orb2{background:radial-gradient(circle,rgba(217,70,239,.24),rgba(139,92,246,.05) 48%,transparent 70%);filter:blur(45px);animation:float2 12s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(35px,-25px,15px)}}
+@keyframes float2{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-35px,25px,0)}}
+.card3d{position:relative;overflow:hidden;transform-style:preserve-3d;will-change:transform}
+.card3d:before{content:"";position:absolute;inset:-1px;background:linear-gradient(120deg,transparent 25%,rgba(167,139,250,.12),transparent 55%);transform:translateX(-120%);transition:transform .7s;pointer-events:none}
+.card3d:hover:before{transform:translateX(120%)}
+.card3d:hover{border-color:rgba(139,92,246,.38);box-shadow:0 35px 90px rgba(91,33,182,.18),inset 0 1px rgba(255,255,255,.1)}
+.iconbox{background:linear-gradient(145deg,rgba(139,92,246,.18),rgba(217,70,239,.05));border:1px solid rgba(167,139,250,.13);transform:translateZ(18px);transition:.35s}
+.card3d:hover .iconbox{transform:translateZ(30px) rotate(-5deg) scale(1.08);box-shadow:0 15px 35px rgba(124,58,237,.22)}
+.bg-gradient-to-r{background-size:200% auto;animation:gradientMove 5s linear infinite}
+@keyframes gradientMove{to{background-position:200% center}}
+#drop{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(139,92,246,.025),rgba(255,255,255,.015));box-shadow:inset 0 1px rgba(255,255,255,.04)}
+#drop:hover{border-color:rgba(167,139,250,.65)!important;box-shadow:0 0 45px rgba(124,58,237,.09),inset 0 0 35px rgba(124,58,237,.04)}
+#owner img{box-shadow:0 0 0 1px rgba(167,139,250,.25),0 0 55px rgba(124,58,237,.22);transition:.5s}
+#owner .card3d:hover img{transform:scale(1.04) rotate(2deg);box-shadow:0 0 0 1px rgba(167,139,250,.45),0 0 75px rgba(124,58,237,.38)}
+@media(max-width:640px){.card3d:hover{transform:translateY(-4px)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+
+</style>
+</head>
+<body class="dark">
+<div class="min-h-screen overflow-hidden">
+  <div class="pointer-events-none fixed inset-0 -z-10">
+    <div class="grid-bg absolute inset-0 opacity-70"></div>
+    <div class="orb absolute -left-32 top-10 h-80 w-80 rounded-full bg-purple-700/20"></div>
+    <div class="orb2 absolute right-0 top-1/3 h-96 w-96 rounded-full bg-fuchsia-600/10"></div>
+  </div>
+
+  <header class="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-950/75 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+      <a href="#" class="flex items-center gap-3">
+        <div class="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 to-fuchsia-600 shadow-lg shadow-purple-900/30">
+          <span class="text-xl font-black">C</span>
+        </div>
+        <div><div class="text-lg font-black tracking-tight">ChatPDF</div><div class="text-[10px] uppercase tracking-[.25em] text-zinc-500">PDF tools</div></div>
+      </a>
+      <nav class="hidden items-center gap-6 text-sm text-zinc-400 md:flex">
+        <a href="#tools" class="hover:text-white">All Tools</a><a href="#about" class="hover:text-white">About</a><a href="#owner" class="hover:text-white">Owner</a>
+      </nav>
+      <a href="#tools" class="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold hover:bg-brand-500">Get Started</a>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl px-4">
+    <section class="relative py-16 text-center sm:py-24">
+      <div class="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-purple-500/20 bg-purple-500/5 px-4 py-2 text-xs font-semibold text-purple-300">
+        <span class="h-2 w-2 animate-pulse rounded-full bg-emerald-400"></span> Professional PDF workspace
+      </div>
+      <h1 class="mx-auto max-w-4xl text-4xl font-black tracking-tight sm:text-6xl lg:text-7xl">All your PDF tools.<br><span class="bg-gradient-to-r from-violet-400 via-purple-300 to-fuchsia-400 bg-clip-text text-transparent">One powerful place.</span></h1>
+      <p class="mx-auto mt-6 max-w-2xl text-base leading-7 text-zinc-400 sm:text-lg">Convert, organize, optimize and secure your documents with a modern, fast and privacy-focused PDF toolkit.</p>
+      <a href="#tools" class="mt-8 inline-flex rounded-2xl bg-gradient-to-r from-brand-600 to-fuchsia-600 px-7 py-4 font-bold shadow-xl shadow-purple-900/30 transition hover:-translate-y-1 hover:from-brand-500 hover:to-fuchsia-500">Explore PDF Tools <span class="ml-2">→</span></a>
+    </section>
+
+    <section id="tools" class="pb-16">
+      <div class="mb-7 flex items-end justify-between"><div><p class="text-xs font-bold uppercase tracking-[.25em] text-brand-400">Toolbox</p><h2 class="mt-2 text-2xl font-black sm:text-3xl">Popular PDF utilities</h2></div><span class="hidden text-sm text-zinc-500 sm:block">Choose a tool to get started</span></div>
+      <div id="toolGrid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"></div>
+    </section>
+
+    <section id="workspace" class="mb-16 hidden">
+      <div class="glass rounded-3xl border border-zinc-800 p-5 shadow-2xl sm:p-8">
+        <div class="mb-6 flex items-center justify-between"><div><p id="workCategory" class="text-xs uppercase tracking-[.2em] text-brand-400"></p><h2 id="workTitle" class="mt-1 text-2xl font-black"></h2></div><button id="closeWork" class="rounded-xl border border-zinc-700 px-3 py-2 text-sm text-zinc-400 hover:text-white">Close</button></div>
+        <div id="workBody"></div>
+        <p id="status" class="mt-4 text-center text-sm"></p>
+      </div>
+    </section>
+
+    <section id="owner" class="mb-16">
+      <div class="glass card3d relative overflow-hidden rounded-3xl border border-purple-500/20 p-6 shadow-2xl sm:p-8">
+        <div class="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-purple-600/15 blur-3xl"></div>
+        <div class="relative flex flex-col items-center gap-6 sm:flex-row">
+          <div class="relative shrink-0"><div class="absolute -inset-2 rounded-full border border-dashed border-purple-400/40"></div><img src="https://i.ibb.co/fYhXMv4c/4714.jpg" alt="Muhammad Arman Rashid" class="relative h-32 w-32 rounded-full border-2 border-purple-400/50 object-cover object-top shadow-xl shadow-purple-900/30"></div>
+          <div class="text-center sm:text-left"><p class="text-xs font-bold uppercase tracking-[.25em] text-brand-400">Owner & Creator</p><h2 class="mt-2 text-2xl font-black sm:text-3xl">Muhammad Arman Rashid</h2><p class="mt-1 text-zinc-400">Professional 3D Web Experience</p><div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start"><a href="tel:8279555219" class="rounded-xl border border-zinc-700 bg-zinc-950/60 px-3 py-2 text-xs hover:border-purple-500/50">📱 8279555219</a><a href="mailto:mohammadarmanrashid@gmail.com" class="rounded-xl border border-zinc-700 bg-zinc-950/60 px-3 py-2 text-xs hover:border-purple-500/50">✉️ mohammadarmanrashid@gmail.com</a></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="pb-16 text-center"><p class="text-sm text-zinc-500">ChatPDF is a frontend-only PDF utility interface. Files are processed in your browser for supported tools.</p></section>
+  </main>
+  <footer class="border-t border-zinc-800/80 py-8 text-center text-xs text-zinc-600">© 2026 ChatPDF • Designed by Muhammad Arman Rashid</footer>
+</div>
+
+<script type="module">
+import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs";
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+const {PDFDocument}=PDFLib;
+const $=id=>document.getElementById(id);
+const tools=[
+["PDF to JPG","Convert PDF pages into JPG images","🖼️","convert-pdf-jpg"],
+["JPG to PDF","Turn multiple images into one PDF","📄","jpg-pdf"],
+["Merge PDF","Combine multiple PDFs into one document","🔗","merge"],
+["Split PDF","Extract selected pages into a new PDF","✂️","split"],
+["Compress PDF","Reduce PDF size in your browser","⚡","compress"],
+["Rotate PDF","Rotate pages and save a new PDF","↻","rotate"],
+["Protect PDF","Add a password to a PDF","🔐","protect"],
+["Unlock PDF","Create a copy of a PDF without restrictions","🔓","unlock"],
+["PDF to Word","Prepare PDF content for Word workflows","📝","coming"],
+["PDF to Excel","Prepare PDF content for spreadsheet workflows","📊","coming"],
+["PDF to PowerPoint","Prepare PDF content for presentation workflows","📽️","coming"],
+["Watermark PDF","Add a text watermark to every page","💧","watermark"]
+];
+$("toolGrid").innerHTML=tools.map((t,i)=>`<button data-tool="${t[3]}" class="card3d glass group rounded-2xl border border-zinc-800 p-5 text-left transition hover:border-purple-500/30"><div class="iconbox mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-purple-500/10 text-2xl">${t[2]}</div><h3 class="font-bold">${t[0]}</h3><p class="mt-2 min-h-10 text-sm leading-5 text-zinc-500">${t[1]}</p><span class="mt-4 inline-block text-xs font-semibold text-brand-400 opacity-0 transition group-hover:opacity-100">Open tool →</span></button>`).join("");
+
+document.querySelectorAll(".card3d").forEach(card=>{
+ card.addEventListener("pointermove",e=>{
+   if(innerWidth<768)return;
+   const r=card.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+   card.style.transform=`perspective(900px) translateY(-6px) rotateX(${(-y*4).toFixed(2)}deg) rotateY(${(x*5).toFixed(2)}deg)`;
+ });
+ card.addEventListener("pointerleave",()=>card.style.transform="");
+});
+$("toolGrid").onclick=e=>{const b=e.target.closest("[data-tool]");if(b)openTool(b.dataset.tool)};
+$("closeWork").onclick=()=>{$("workspace").classList.add("hidden");window.scrollTo({top:$("tools").offsetTop-80,behavior:"smooth"})};
+
+function openTool(type){
+ const names={ "convert-pdf-jpg":"PDF to JPG","jpg-pdf":"JPG to PDF",merge:"Merge PDF",split:"Split PDF",compress:"Compress PDF",rotate:"Rotate PDF",protect:"Protect PDF",unlock:"Unlock PDF",watermark:"Watermark PDF",coming:"Coming Soon"};
+ $("workspace").classList.remove("hidden");$("workCategory").textContent="ChatPDF tool";$("workTitle").textContent=names[type]||"PDF Tool";$("status").textContent="";
+ if(type==="convert-pdf-jpg") renderPdfJpg(); else if(type==="jpg-pdf") renderJpgPdf(); else if(type==="merge") renderMerge(); else if(type==="split") renderSplit(); else if(type==="rotate") renderRotate(); else if(type==="watermark") renderWatermark(); else if(type==="compress") renderSimple("Compress PDF","Choose a PDF and create a browser-processed copy. Advanced compression depends on PDF structure.","Select PDF","compress"); else if(type==="protect") renderSimple("Protect PDF","Select a PDF and download a password-protected copy.","Select PDF","protect"); else if(type==="unlock") renderSimple("Unlock PDF","Select a PDF and attempt to save an unlocked copy.","Select PDF","unlock"); else renderComing();
+ $("workspace").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function zone(inputId,multiple=true){return `<div class="rounded-2xl border-2 border-dashed border-zinc-700 p-8 text-center transition" id="drop"><div class="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-2xl bg-purple-500/10 text-2xl">☁️</div><h3 class="font-bold">Drop file${multiple?"s":""} here</h3><p class="mt-1 text-sm text-zinc-500">or select from your device</p><button id="pick" class="mt-5 rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold hover:bg-brand-500">Select File${multiple?"s":""}</button><input id="${inputId}" type="file" ${multiple?"multiple":""} class="hidden" accept="${multiple?"application/pdf,image/jpeg,image/png":"application/pdf"}"></div><div id="result" class="mt-5"></div>`}
+function wireDrop(){const d=$("drop"),i=document.querySelector("#"+$("pick").nextElementSibling.id);$("pick").onclick=e=>{e.stopPropagation();i.click()};d.onclick=e=>{if(e.target!==$("pick"))i.click()};["dragenter","dragover"].forEach(x=>d.addEventListener(x,e=>{e.preventDefault();d.classList.add("drop-active")}));["dragleave","drop"].forEach(x=>d.addEventListener(x,e=>{e.preventDefault();d.classList.remove("drop-active")}));d.addEventListener("drop",e=>{i.files=e.dataTransfer.files;i.dispatchEvent(new Event("change"))});return i}
+function renderPdfJpg(){ $("workBody").innerHTML=zone("f",false);const i=wireDrop();i.accept="application/pdf";i.onchange=()=>{if(i.files[0])convertPdfJpg(i.files[0])}}
+async function convertPdfJpg(file){try{$("status").textContent="Rendering PDF…";const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;const zip=new JSZip();for(let n=1;n<=pdf.numPages;n++){ $("status").textContent=`Rendering page ${n} of ${pdf.numPages}…`;const p=await pdf.getPage(n),v=p.getViewport({scale:1.6}),c=document.createElement("canvas");c.width=v.width;c.height=v.height;await p.render({canvasContext:c.getContext("2d"),viewport:v}).promise;const blob=await new Promise(r=>c.toBlob(r,"image/jpeg",.92));zip.file(`page-${String(n).padStart(3,"0")}.jpg`,blob)}const blob=await zip.generateAsync({type:"blob"});download(blob,"chatpdf-images.zip");$("status").textContent="Done — JPG images downloaded as ZIP."; }catch(e){$("status").textContent="Could not convert this PDF."}}
+function renderJpgPdf(){ $("workBody").innerHTML=zone("f",true);const i=wireDrop();i.accept="image/jpeg,image/png";i.onchange=async()=>{if(!i.files.length)return;try{const pdf=new jspdf.jsPDF({unit:"pt",format:"a4"});for(let n=0;n<i.files.length;n++){if(n)pdf.addPage();const f=i.files[n],u=URL.createObjectURL(f),im=new Image();await new Promise(r=>{im.onload=r;im.src=u});const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight(),s=Math.min((pw-40)/im.width,(ph-40)/im.height),w=im.width*s,h=im.height*s;pdf.addImage(u,f.type==="image/png"?"PNG":"JPEG",(pw-w)/2,(ph-h)/2,w,h);URL.revokeObjectURL(u)}pdf.save("chatpdf-images.pdf");$("status").textContent="Done — PDF downloaded."}catch(e){$("status").textContent="Could not create PDF."}}}
+function pdfPicker(multiple,cb){$("workBody").innerHTML=zone("f",multiple);const i=wireDrop();i.accept="application/pdf";i.onchange=()=>{if(i.files.length)cb([...i.files])}}
+async function loadPdfs(files){return Promise.all(files.map(async f=>PDFDocument.load(await f.arrayBuffer())))}
+function download(blob,name){const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+function renderMerge(){pdfPicker(true,async fs=>{try{const out=await PDFDocument.create();for(const f of await loadPdfs(fs)){const pages=await out.copyPages(f,f.getPageIndices());pages.forEach(p=>out.addPage(p))}download(new Blob([await out.save()],{type:"application/pdf"}),"merged.pdf");$("status").textContent="Merged PDF downloaded."}catch(e){$("status").textContent="Could not merge PDFs."}})}
+function renderSplit(){pdfPicker(false,async fs=>{try{const f=await loadPdfs(fs);const p=f[0];const out=await PDFDocument.create();const pages=p.getPages();pages.forEach((_,idx)=>{});const pageNums=prompt(`Enter pages to extract (e.g. 1,3,5 or 1-3):`,`1-${Math.min(3,pages.length)}`);if(!pageNums)return;const ids=parsePages(pageNums,pages.length);const copied=await out.copyPages(p,ids);copied.forEach(x=>out.addPage(x));download(new Blob([await out.save()],{type:"application/pdf"}),"split.pdf");$("status").textContent="Split PDF downloaded."}catch(e){$("status").textContent="Could not split this PDF."}})}
+function parsePages(s,max){const set=new Set();s.split(",").forEach(x=>{if(x.includes("-")){let[a,b]=x.split("-").map(Number);for(let i=a;i<=b;i++)if(i>=1&&i<=max)set.add(i-1)}else{const n=Number(x);if(n>=1&&n<=max)set.add(n-1)}});return [...set].sort((a,b)=>a-b)}
+function renderRotate(){pdfPicker(false,async fs=>{try{const p=(await loadPdfs(fs))[0];p.getPages().forEach(x=>x.setRotation(PDFLib.degrees(90)));download(new Blob([await p.save()],{type:"application/pdf"}),"rotated.pdf");$("status").textContent="Rotated PDF downloaded."}catch(e){$("status").textContent="Could not rotate PDF."}})}
+function renderWatermark(){pdfPicker(false,async fs=>{try{const p=(await loadPdfs(fs))[0],text=prompt("Watermark text:","ChatPDF");if(!text)return;p.getPages().forEach(x=>{x.drawText(text,{x:100,y:x.getHeight()/2,size:38,opacity:.18,rotate:PDFLib.degrees(35)})});download(new Blob([await p.save()],{type:"application/pdf"}),"watermarked.pdf");$("status").textContent="Watermarked PDF downloaded."}catch(e){$("status").textContent="Could not add watermark."}})}
+function renderSimple(title,desc,button,type){$("workBody").innerHTML=`<div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6"><p class="text-sm text-zinc-400">${desc}</p><button id="simplePick" class="mt-5 rounded-xl bg-brand-600 px-5 py-3 font-semibold">${button}</button><input id="simpleFile" type="file" accept="application/pdf" class="hidden"></div>`;$("simplePick").onclick=()=>$("simpleFile").click();$("simpleFile").onchange=()=>{$("status").textContent=`${title} selected. This browser-only demo keeps your file local; specialized optimization/security may require a dedicated PDF engine.`}}
+function renderComing(){$("workBody").innerHTML=`<div class="rounded-2xl border border-purple-500/20 bg-purple-500/5 p-10 text-center"><div class="text-4xl">✨</div><h3 class="mt-4 text-xl font-black">Coming soon</h3><p class="mt-2 text-sm text-zinc-500">This ChatPDF tool is part of the professional PDF suite and can be connected to a full document engine.</p></div>`}
+</script>
+</body>
+</html>
